@@ -1,30 +1,31 @@
-const CartItem = ({ cartItems, onContinueShopping, onUpdateQuantity, onRemoveItem }) => {
+const CartItem = ({ cartItems = [], onContinueShopping, onUpdateQuantity, onRemoveItem }) => {
   const cart = cartItems;
 
   const calculateTotalAmount = () => {
     let total = 0;
     cart.forEach((item) => {
-      const price = parseFloat(item.cost.substring(1));
-      total += price * item.quantity;
+      const price = parseFloat(String(item.cost).replace('$', '')) || 0;
+      total += price * Number(item.quantity || 0);
     });
     return total;
   };
 
   const calculateTotalCost = (item) => {
-    const price = parseFloat(item.cost.substring(1));
-    return price * item.quantity;
+    const price = parseFloat(String(item.cost).replace('$', '')) || 0;
+    return price * Number(item.quantity || 0);
   };
 
   const handleIncrement = (item) => {
-    onUpdateQuantity(item.name, item.quantity + 1);
+    onUpdateQuantity(item.name, Number(item.quantity || 0) + 1);
   };
 
   const handleDecrement = (item) => {
-    if (item.quantity > 1) {
-      onUpdateQuantity(item.name, item.quantity - 1);
-    } else {
+    const nextQuantity = Number(item.quantity || 0) - 1;
+    if (nextQuantity <= 0) {
       onRemoveItem(item.name);
+      return;
     }
+    onUpdateQuantity(item.name, nextQuantity);
   };
 
   const handleRemove = (itemName) => {
@@ -32,7 +33,7 @@ const CartItem = ({ cartItems, onContinueShopping, onUpdateQuantity, onRemoveIte
   };
 
   const handleCheckoutShopping = () => {
-    alert('Functionality to be added for future reference');
+    alert('Coming Soon');
   };
 
   return (

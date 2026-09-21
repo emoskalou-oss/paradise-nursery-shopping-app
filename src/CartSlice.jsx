@@ -3,42 +3,53 @@ const initialState = {
 };
 
 export const addItem = (state, product) => {
+  const safeState = state ?? initialState;
   const { name, image, cost } = product;
-  const existingItem = state.items.find((item) => item.name === name);
+  const existingItem = safeState.items.find((item) => item.name === name);
 
   if (existingItem) {
-    existingItem.quantity += 1;
-  } else {
-    state.items.push({ name, image, cost, quantity: 1 });
+    return {
+      ...safeState,
+      items: safeState.items.map((item) =>
+        item.name === name ? { ...item, quantity: Number(item.quantity || 0) + 1 } : item,
+      ),
+    };
   }
 
-  return state;
+  return {
+    ...safeState,
+    items: [...safeState.items, { name, image, cost, quantity: 1 }],
+  };
 };
 
 export const removeItem = (state, itemName) => {
-  const nextState = {
-    ...state,
-    items: state.items.filter((item) => item.name !== itemName),
+  const safeState = state ?? initialState;
+  return {
+    ...safeState,
+    items: safeState.items.filter((item) => item.name !== itemName),
   };
-
-  return nextState;
 };
 
 export const updateQuantity = (state, itemName, quantity) => {
-  const nextState = {
-    ...state,
-    items: state.items.map((item) =>
-      item.name === itemName ? { ...item, quantity } : item,
+  const safeState = state ?? initialState;
+  const safeQuantity = Math.max(0, Number(quantity) || 0);
+
+  if (safeQuantity === 0) {
+    return removeItem(safeState, itemName);
+  }
+
+  return {
+    ...safeState,
+    items: safeState.items.map((item) =>
+      item.name === itemName ? { ...item, quantity: safeQuantity } : item,
     ),
   };
-
-  return nextState;
 };
 
 export const cartReducer = (state = initialState, action) => {
   switch (action.type) {
     case 'addItem':
-      return addItem({ ...state }, action.payload);
+      return addItem(state, action.payload);
     case 'removeItem':
       return removeItem(state, action.payload);
     case 'updateQuantity':
@@ -46,10 +57,6 @@ export const cartReducer = (state = initialState, action) => {
     default:
       return state;
   }
-};
-
-export const store = {
-  cart: initialState,
 };
 
 export default cartReducer;
