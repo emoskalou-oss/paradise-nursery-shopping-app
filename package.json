@@ -2,6 +2,7 @@
   "name": "paradise-nursery-shopping-app",
   "private": true,
   "version": "1.0.0",
+  "homepage": "https://emoskalou-oss.github.io/paradise-nursery-shopping-app/",
   "type": "module",
   "scripts": {
     "dev": "vite",
